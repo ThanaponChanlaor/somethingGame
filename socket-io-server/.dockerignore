@@ -1,0 +1,20 @@
+# Exclude typical development files and directories
+node_modules
+npm-debug.log
+yarn-error.log
+.DS_Store
+.git
+
+# Exclude any files that are part of your version control system
+.gitignore
+.gitattributes
+
+# Exclude any files that are specific to your IDE or code editor
+.vscode/
+.idea/
+
+# Exclude any build artifacts or temporary files
+*.log
+*.swp
+*.swo
+*.bak
