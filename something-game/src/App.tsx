@@ -2,9 +2,7 @@
 import './App.css'
 import { useEffect, useState } from 'react';
 import PlayerBox from "./components/PlayerBox"
-import io from 'socket.io-client';
-// 'http://192.168.1.39:3001');
-const socket = io("http://192.168.0.213:3001");
+import { socketClient } from './socketio-client/gameTyping';
 
 interface allPlayerData {
 	id: string,
@@ -20,34 +18,34 @@ function App() {
 	const [time, setTime] = useState<number>(0);
 
 	useEffect(() => {
-		socket.on('initial-data', (initialData: allPlayerData[]) => {
+		socketClient.on('initial-data', (initialData: allPlayerData[]) => {
 		  setAllPlayer(initialData);
 		});
 	
-		socket.on('updated-data', (updatedData: allPlayerData[]) => {
+		socketClient.on('updated-data', (updatedData: allPlayerData[]) => {
 		  setAllPlayer(updatedData);
 		});
 
-		socket.on('time', (timeOnSocket:number) => {
+		socketClient.on('time', (timeOnSocket:number) => {
 			setTime(timeOnSocket);
 		});
 	
 		return () => {
-		  socket.off('initial-data');
-		  socket.off('updated-data');
-		  socket.off('time');
+		  socketClient.off('initial-data');
+		  socketClient.off('updated-data');
+		  socketClient.off('time');
 		};
 	  }, []);
 	  
 	  useEffect(() => {		
 		const timer = setInterval(() => {
 		  if (time > 1) {
-			socket.emit('time', time - 1);
+			socketClient.emit('time', time - 1);
 		  } else {
 			clearInterval(timer);
-			socket.emit('time', 0);
+			socketClient.emit('time', 0);
 			allPlayer.map((item) => {
-				socket.emit('update-disabledInput', item.id, true);
+				socketClient.emit('update-disabledInput', item.id, true);
 			})
 		  }		  
 		}, 1000);
@@ -55,20 +53,20 @@ function App() {
 	  }, [time]);
 
 	  const startGame = (maxTime:number) => {
-		socket.emit('time', maxTime);
+		socketClient.emit('time', maxTime);
 	  }
 
 	  const stopGame = () => {
-		socket.emit('time', 0);
+		socketClient.emit('time', 0);
 		allPlayer.map((item) => {
-			socket.emit('update-disabledInput', item.id, true);
+			socketClient.emit('update-disabledInput', item.id, true);
 		})
 	  }
 
 	  const resetAllData = () => {
 		allPlayer.map((item) => {
-			socket.emit('update-score', item.id, 0);
-			socket.emit('update-textInput', item.id, "");
+			socketClient.emit('update-score', item.id, 0);
+			socketClient.emit('update-textInput', item.id, "");
 		})
 
 	  };

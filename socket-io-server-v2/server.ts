@@ -7,7 +7,7 @@ import { INITIAL_DATA } from './configs/socketio';
 
 export const app: Application = express()
 
-app.use(cors())
+app.use(cors({origin: ["*"]}))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
@@ -72,6 +72,17 @@ io.on('connection', (socket: Socket) => {
         data[player] = {
           ...data[player],
           disabledInput: NewDisabledInput,
+        };
+        io.emit("updated-data", data);
+      }
+    });
+    
+    socket.on("update-textInput", (id, NewTextInput) => {
+      const player = data.findIndex((player) => player.id === id);
+      if (player !== -1) {
+        data[player] = {
+          ...data[player],
+          textInput: NewTextInput,
         };
         io.emit("updated-data", data);
       }
